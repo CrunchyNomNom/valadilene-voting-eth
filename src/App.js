@@ -1,6 +1,6 @@
 import { useStoreApi } from "./storeApi";
-import { Button, TextField } from "@material-ui/core";
-import { Link, Redirect } from "react-router-dom";
+import { TextField } from "@material-ui/core";
+import { Link } from "react-router-dom";
 import useStyles from "./styles"
 
 import "./vote.css";

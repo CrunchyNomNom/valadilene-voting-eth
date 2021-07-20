@@ -1,5 +1,10 @@
 # Voting
 
+## Introduction
+
+## Installation
+
+The software is working under Linux and requires installation of basic Javascript tools (`node`, `npm`). From the project directory run command `npm install` to download dependencies automatically.
 
 ## Available Scripts
 
@@ -27,8 +32,6 @@ Runs test for contract functionality. (written using [https://www.chaijs.com/](C
 
 
 ## TODO
- - choose candidates from list
- - balance auto-update
  - styles
  - autogenerate names for the candidates
  - caching wallet (one-time login, cookie?)

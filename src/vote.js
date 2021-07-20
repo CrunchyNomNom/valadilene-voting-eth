@@ -11,12 +11,11 @@ import "./vote.css";
 function Vote() {
   const controllingEvents = ["LetTheVoteBegin", "NewMayor", "SayonaraEveryone"];
   const defaultGas = { gas: 4612388, gasPrice: '1000000000' };
-  const classes = useStyles();
-
+  
   const { address, balance, setBalance, events, setEvents, phase, setPhase, winner, setWinner, candidates, setCandidates, candidate, setCandidate, soul, setSoul } = useStoreApi();
-  const web3 = new Web3(window.ethereum);
-  // const classes = useStyles();
   const params = useParams();
+  const classes = useStyles();
+  const web3 = new Web3(window.ethereum);
   const contract = new web3.eth.Contract(fetchAbi, params.id);
 
 
@@ -27,54 +26,40 @@ function Vote() {
 
     await contract
       .methods.mint(target, amount)
-      .send({
-        from: address.toString(), ...defaultGas
-      });
+      .send({ from: address.toString(), ...defaultGas });
   };
 
   const beginVoting = async() => {
     await contract
       .methods.begin_voting()
-      .send({
-        from: address.toString(), ...defaultGas
-      });
+      .send({ from: address.toString(), ...defaultGas });
   };
 
   const checkOutcome = async() => {
     await contract
       .methods.check_outcome()
-      .send({
-        from: address.toString(), ...defaultGas
-      });
+      .send({ from: address.toString(), ...defaultGas });
   };
 
   const castEnvelope = async() => {
     const envelope = await contract
       .methods.compute_envelope(candidate, soul)
-      .call({
-        from: address.toString(),
-      })
+      .call({ from: address.toString(), })
     await contract
       .methods.cast_envelope(envelope)
-      .send({
-        from: address.toString(), ...defaultGas
-      });
+      .send({ from: address.toString(), ...defaultGas });
   }
 
   const openEnvelope = async() => {
     await contract
       .methods.open_envelope(candidate, soul)
-      .send({
-        from: address.toString(), ...defaultGas
-      });
+      .send({ from: address.toString(), ...defaultGas });
   }
 
   const balanceOf = async() => {
     await contract
       .methods.balanceOf(address)
-      .call({
-        from: address.toString(),
-      })
+      .call({ from: address.toString(), })
       .then(value =>
         setBalance(value)
       );
@@ -91,7 +76,7 @@ function Vote() {
 
 
   useEffect(() => {
-    contract.getPastEvents("allEvents")
+    contract.getPastEvents("allEvents", { fromBlock: 0, toBlock: 'latest' })
     .then(res => {
       setEvents(res
         .map(e => e.event)
@@ -116,11 +101,15 @@ function Vote() {
     if(address) {
       contract
         .methods.candidates_list()
-        .call({
-          from: address.toString()
-        })
+        .call({ from: address.toString() })
         .then(res =>
           setCandidates(res)
+        );
+      contract
+        .methods.is_quorum_reached()
+        .call({ from: address.toString() })
+        .then(res =>
+          setPhase({...phase, quorumReached: res})
         );
       balanceOf();
     }
@@ -130,16 +119,16 @@ function Vote() {
     if(address) {
       balanceOf();
     }
-  }, [balance])
+  }, [balance]);
 
 
   return (
     <div>
       { address ? ( 
         <>
-        <p>Your balance is {balance} SOUL.</p><Button className={classes.btn} variant="outlined" onClick={async() => balanceOf()}>
-          Refresh balance
-        </Button>
+        <p> Your balance is {balance} SOUL. </p>
+        <Button className={classes.btn} variant="outlined" onClick={async() => balanceOf()}> Refresh balance </Button>
+        {events.map(e => <li>{e}</li>)}
         <div> {
           phase.postVoting && winner ? (
             <p> Long live {winner}, the new Mayor! </p>
@@ -147,7 +136,7 @@ function Vote() {
             <p> A draw! All SOUL has been transfered to the escrow. </p>
           ) : phase.voting ? (
             <div>
-              <p>Send or open your signed vote here</p>
+              <p> Send or open your signed vote here </p>
               <FormControl variant="outlined" >
                 <InputLabel className={classes.tf}>Candidate</InputLabel>
                 <Select className={classes.select} value={candidate} onChange={handleCandidateChange} required autoWidth>
@@ -157,29 +146,31 @@ function Vote() {
                 </Select>
               </FormControl>
               <TextField InputProps={{className: classes.tf}} InputLabelProps={{className: classes.tf}} label="Soul" variant="outlined" onChange={handleSoulChange} required />
-              {!candidate || !soul ?
-                <><Button className={classes.btn} variant="outlined" disabled>CAST</Button><Button className={classes.btn} variant="outlined" disabled>OPEN</Button></>
-                : <>
-                  <Button className={classes.btn} variant="outlined" onClick={castEnvelope}>CAST</Button>
-                  <Button className={classes.btn} variant="outlined" onClick={openEnvelope}>OPEN</Button>
-                </>
-              }
-              <div className="deployer">
-                <p>
-                  Note: the panel below can be used only by the deployer.
-                </p>
-                <Button className={classes.btn} variant="outlined" onClick={async() => checkOutcome()}>CHECK OUTCOME</Button>
-              </div>
+              { phase.quorumReached ? (
+                <div>
+                  {!candidate || !soul ?
+                    <Button className={classes.btn} variant="outlined" disabled>OPEN</Button>
+                    : <Button className={classes.btn} variant="outlined" onClick={openEnvelope}>OPEN</Button>
+                  }
+                  <div className="deployer">
+                    <p> Note: the panel below can be used only by the deployer. </p>
+                    <Button className={classes.btn} variant="outlined" onClick={async() => checkOutcome()}>CHECK OUTCOME</Button>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  {!candidate || !soul ?
+                    <Button className={classes.btn} variant="outlined" disabled>CAST</Button>
+                    : <Button className={classes.btn} variant="outlined" onClick={castEnvelope}>CAST</Button>
+                  }
+                </div>
+              )}
             </div>
           ) : (
             <div>
-              <p>
-                Please wait for voting to begin.
-              </p>
+              <p> Please wait for voting to begin. </p>
               <div className="deployer">
-                <p>
-                  Note: the panel below can be used only by the deployer.
-                </p>
+                <p> Note: the panel below can be used only by the deployer. </p>
                 <form onSubmit={e => mint(e)}>
                   <TextField InputProps={{className: classes.tf}} InputLabelProps={{className: classes.tf}} required label="Receiver address" />
                   <TextField InputProps={{className: classes.tf}} InputLabelProps={{className: classes.tf}} required label="Amount" type="number" />

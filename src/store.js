@@ -12,6 +12,7 @@ const initialState = {
   candidates: [],
   phase: {
     voting: false,
+    quorumReached: false,
     postVoting: false,
     postVotingSayonara: false,
   },

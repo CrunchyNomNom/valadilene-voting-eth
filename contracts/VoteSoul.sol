@@ -22,6 +22,7 @@ contract VoteSoul is ERC20 {
     struct CandidateInfo {
         bool is_candidate;
         uint256 soul;
+        uint256 voters;
     }
 
     event LetTheVoteBegin();
@@ -53,7 +54,7 @@ contract VoteSoul is ERC20 {
         escrow = _escrow;
         candidates = _candidates;
         for(uint i = 0; i < candidates.length; i++) {
-            candidates_info[candidates[i]] = CandidateInfo({is_candidate: true, soul: 0});
+            candidates_info[candidates[i]] = CandidateInfo({is_candidate: true, soul: 0, voters: 0});
         }
     }
 
@@ -154,6 +155,7 @@ contract VoteSoul is ERC20 {
         // if the voter cannot pay his bet or votes for a non-candidate address, his vote is invalidated
         if(balanceOf(_msgSender()) >= _soul && candidates_info[_candidate].is_candidate) {
             candidates_info[_candidate].soul += _soul;
+            candidates_info[_candidate].voters += 1;
             souls[_msgSender()] = Refund({amount: _soul, candidate: _candidate});
             transfer(address(this), _soul);
 
@@ -175,12 +177,13 @@ contract VoteSoul is ERC20 {
         bool only_winner;
         
         for(uint i = 0; i < candidates.length; i++) {
-            if(candidates_info[candidates[i]].soul > candidates_info[winner].soul) {
+            if(candidates_info[candidates[i]].soul > candidates_info[winner].soul
+            || candidates_info[candidates[i]].soul == candidates_info[winner].soul && candidates_info[candidates[i]].voters > candidates_info[winner].voters) {
                 winner = candidates[i];
                 only_winner = true;
-            } else if(candidates_info[candidates[i]].soul == candidates_info[winner].soul) {
+            } else if(candidates_info[candidates[i]].soul == candidates_info[winner].soul && candidates_info[candidates[i]].voters == candidates_info[winner].voters) {
                 only_winner = false;
-            }
+            } // else winner does not change
         }
 
         if(only_winner) {

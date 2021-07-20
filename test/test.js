@@ -47,7 +47,7 @@ describe('VoteSoul', function () {
 
     it('deployer should not be able to begin the voting prematurely', async function () {
         const contract = new ethers.Contract(ADDRESS_CONTRACT, cf.abi, deployer);
-        await expectRevert(contract.beginVoting(),
+        await expectRevert(contract.begin_voting(),
             "Inefficient voting participants to reach the quorum."
         );
     });
@@ -58,7 +58,7 @@ describe('VoteSoul', function () {
         const contract = new ethers.Contract(ADDRESS_CONTRACT, cf.abi, deployer);
         const mint = await contract.mint(signer.getAddress(), 100);
         const mint2 = await contract.mint(signer2.getAddress(), 100);
-        await expect(contract.beginVoting())
+        await expect(contract.begin_voting())
             .to.emit(contract, 'LetTheVoteBegin');
     });
 

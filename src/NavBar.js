@@ -1,10 +1,9 @@
-import React from 'react';
+import { useEffect } from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
 import { useStoreApi } from "./storeApi";
 import Web3 from "web3";
-import useStyle from "./styles";
 
 import "./vote.css"
 import useStyles from './styles';
@@ -13,7 +12,7 @@ function NavBar () {
     const { address, web3, setAddress, setWeb3 } = useStoreApi();
     const classes = useStyles();
 
-    React.useEffect(() => {
+    useEffect(() => {
       if(web3 === null) {
           setWeb3(window.ethereum ? new Web3(window.ethereum) : null);
       }
