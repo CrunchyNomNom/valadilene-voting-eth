@@ -1,12 +1,17 @@
 import { useStoreApi } from "./storeApi";
-// import useWeb3 from "./useWeb3";
 import Web3 from "web3";
 import { Button, TextField } from "@material-ui/core";
-import {fetchAbi, fetchBytecode} from "./fetchAbi";
+import { fetchAbi, fetchBytecode } from "./fetchAbi";
+import { Link } from "react-router-dom";
+import useStyles from "./styles"
+
+import "./vote.css";
+
 
 function Deploy() {
   const { address, contractAddress, setContractAddress } = useStoreApi();
   const web3 = new Web3(window.ethereum);
+  const classes = useStyles();
 
   const deployContract = async e => {
     e.preventDefault();
@@ -31,27 +36,19 @@ function Deploy() {
   };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>You can deploy a voting contract here</p>
-        
-        <form onSubmit={e => deployContract(e)}>
-          <TextField required label="quorum" variant="filled" type="number" />
-          <TextField required label="Escrow Address" variant="filled" />
-          <TextField required label="Candidates Addresses" variant="filled" />
-          <Button
-            style={{ margin: "10px" }}
-            type="submit"
-            variant="outlined"
-            color="default"
-          >
-            DEPLOY
-          </Button>
-        </form>
-        <p>{contractAddress && 
-          "The address of deployed contract: " + contractAddress
-        }</p>
-      </header>
+    <div>
+      <p>You can deploy a voting contract here</p>
+      
+      <form onSubmit={e => deployContract(e)}>
+        <TextField required label="Quorum" type="number" InputProps={{className: classes.tf}} InputLabelProps={{className: classes.tf}} />
+        <TextField required label="Escrow Address" InputProps={{className: classes.tf}} InputLabelProps={{className: classes.tf}} />
+        <TextField required label="Candidates Addresses" InputProps={{className: classes.tf}} InputLabelProps={{className: classes.tf}} />
+        <Button className={classes.btn} type="submit" variant="outlined" >DEPLOY</Button>
+      </form>
+      {contractAddress && <div>
+        <p>The address of deployed contract:  </p> <Link to={"/" + contractAddress} className={classes.link}>{contractAddress}</Link>
+      </div>
+      }
     </div>
   );
 }

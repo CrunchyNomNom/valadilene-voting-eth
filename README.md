@@ -32,7 +32,7 @@ Runs test for contract functionality. (written using [https://www.chaijs.com/](C
  - styles
  - autogenerate names for the candidates
  - caching wallet (one-time login, cookie?)
- - separate deployer view
+ - separate deployer view & general component refactor (granularize)
  - auto-update of the component (event listeners?)
  - contract: research increaseAllowance method while open_envelope rather than _transfer while check_outcome
  - fetch contract abi (right now hardcoded into _fetchAbi.js_)

@@ -1,8 +1,5 @@
-.Vote {
+body {
   text-align: center;
-}
-
-.Vote-header {
   background-color: #282c34;
   min-height: 100vh;
   display: flex;
@@ -11,4 +8,18 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+}
+
+
+
+.deployer {
+  margin-top: 20%;
+  font-size: calc(10px + 0.5vmin);
+  color: rgb(155, 44, 0)
+}
+
+.App-link {
+  color: white;
+  position: relative;
+  margin-left: '10px';
 }

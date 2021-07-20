@@ -1,57 +1,27 @@
 import { useStoreApi } from "./storeApi";
-import useWeb3 from "./useWeb3";
 import { Button, TextField } from "@material-ui/core";
-import NavBar from "./NavBar";
-import { fetchAbi } from "./fetchAbi";
+import { Link, Redirect } from "react-router-dom";
+import useStyles from "./styles"
 
-import "./App.css";
-
+import "./vote.css";
 
 function App() {
-  const { balance, address, web3, setAddress, setBalance } = useStoreApi();
-  const abi = fetchAbi;
+  const { contractAddress, setContractAddress } = useStoreApi();
+  const classes = useStyles();
 
-  const updateBalance = async fromAddress => {
-    await web3.eth.getBalance(fromAddress).then(value => {
-      setBalance(web3.utils.fromWei(value, "ether"));
-    });
-  };
-
-  const sendTransaction = async e => {
-    e.preventDefault();
-    const amount = e.target[0].value;
-    const recipient = e.target[1].value;
-    await web3.eth.sendTransaction({
-      from: address,
-      to: recipient,
-      value: web3.utils.toWei(amount, "ether")
-    });
-    updateBalance(address);
-  };
+  const handleContractAddressChange = (event) => {
+    setContractAddress(event.target.value);
+  }
 
   return (
     <div className="App">
       <header className="App-header">
         <p>Welcome in voting system dapp</p>
-        
-        <form onSubmit={e => sendTransaction(e)}>
-          <TextField
-            required
-            label="Amount"
-            inputProps={{ step: "any" }}
-            type="number"
-            variant="filled"
-          />
-          <TextField required label="Recipient Address" variant="filled" />
-          <Button
-            style={{ margin: "10px" }}
-            type="submit"
-            variant="outlined"
-            color="default"
-          >
-            Send Crypto
-          </Button>
-        </form>
+        <p>Go to your voting smart contract page</p>
+
+          <TextField required label="Address" variant="outlined" onChange={handleContractAddressChange} InputProps={{className: classes.tf}} InputLabelProps={{className: classes.tf}}  />
+          <Link to={"/" + contractAddress} className={classes.btn}>GO</Link>
+        <p>or deploy your own <Link to="/deploy" className="App-link">here.</Link></p>
       </header>
     </div>
   );

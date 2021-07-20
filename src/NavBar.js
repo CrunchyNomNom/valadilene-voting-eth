@@ -1,16 +1,17 @@
 import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import { useStoreApi } from "./storeApi";
-import useWeb3 from "./useWeb3";
 import Web3 from "web3";
+import useStyle from "./styles";
 
-
+import "./vote.css"
+import useStyles from './styles';
 
 function NavBar () {
-    const { balance, address, web3, setAddress, setBalance, setWeb3 } = useStoreApi();
+    const { address, web3, setAddress, setWeb3 } = useStoreApi();
+    const classes = useStyles();
 
     React.useEffect(() => {
       if(web3 === null) {
@@ -36,13 +37,13 @@ function NavBar () {
 
   return (
     <div>
-      <AppBar>
+      <AppBar className={classes.bar}>
         <Toolbar>
             {address ? (
               <>
                 <p> Connected to {address} </p>
               </>
-            ) : <Button onClick={() => getUserAccount()}> Connect your wallet </Button>}
+            ) : <Button className={classes.btn} onClick={() => getUserAccount()}> Connect your wallet </Button>}
         </Toolbar>
       </AppBar>
     </div>
